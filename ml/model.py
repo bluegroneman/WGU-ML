@@ -1,7 +1,8 @@
 import pickle
 from sklearn.metrics import fbeta_score, precision_score, recall_score
 from ml.data import process_data
-# TODO: add necessary import
+from sklearn.linear_model import LogisticRegression
+from typing import Any
 
 # Optional: implement hyperparameter tuning.
 def train_model(X_train, y_train):
@@ -19,8 +20,11 @@ def train_model(X_train, y_train):
     model
         Trained machine learning model.
     """
-    # TODO: implement the function
-    pass
+    # Use a solver that reliably converges with one-hot encoded sparse-like features
+    # and binary classification. Increasing max_iter further reduces the chance of
+    # ConvergenceWarning on this dataset.
+    clf = LogisticRegression(solver="liblinear", max_iter=2000)
+    return clf.fit(X_train, y_train)
 
 
 def compute_model_metrics(y, preds):
@@ -50,7 +54,7 @@ def inference(model, X):
 
     Inputs
     ------
-    model : ???
+    model : Logistice Regression model
         Trained machine learning model.
     X : np.array
         Data used for prediction.
@@ -59,8 +63,7 @@ def inference(model, X):
     preds : np.array
         Predictions from the model.
     """
-    # TODO: implement the function
-    pass
+    return model.predict(X)
 
 def save_model(model, path):
     """ Serializes model to a file.
@@ -72,13 +75,11 @@ def save_model(model, path):
     path : str
         Path to save pickle file.
     """
-    # TODO: implement the function
-    pass
+    pickle.dump(model, open(path, "wb"))
 
 def load_model(path):
     """ Loads pickle file from `path` and returns it."""
-    # TODO: implement the function
-    pass
+    return pickle.load(open(path, "rb"))
 
 
 def performance_on_categorical_slice(
@@ -117,12 +118,21 @@ def performance_on_categorical_slice(
     fbeta : float
 
     """
-    # TODO: implement the function
+    # Filter the dataframe to the requested slice
+    data_slice = data[data[column_name] == slice_value]
+    # If the slice has no rows, return neutral metrics to avoid division by zero
+    if data_slice.shape[0] == 0:
+        return 1.0, 1.0, 1.0
+
     X_slice, y_slice, _, _ = process_data(
-        # your code here
-        # for input data, use data in column given as "column_name", with the slice_value 
-        # use training = False
+        data_slice,
+        categorical_features=categorical_features,
+        label=label,
+        training=False,
+        encoder=encoder,
+        lb=lb,
     )
-    preds = None # your code here to get prediction on X_slice using the inference function
+    from ml.model import inference
+    preds = inference(model, X_slice)
     precision, recall, fbeta = compute_model_metrics(y_slice, preds)
     return precision, recall, fbeta
