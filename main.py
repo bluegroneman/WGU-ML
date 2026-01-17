@@ -1,4 +1,5 @@
 import os
+import pdb
 
 import pandas as pd
 from fastapi import FastAPI
@@ -37,14 +38,13 @@ app = FastAPI()
 @app.get("/")
 async def get_root():
     """ Say hello!"""
-    return {"message": "Hello and welcome to the ML API used for predicting individual salary based on census metrics"}
-    pass
+    return {"message": "Hello and welcome to the ML API used for predicting individual salary based on census metrics", "status": "ok"}
 
 
 @app.post("/data/")
 async def post_inference(data: Data):
     # DO NOT MODIFY: turn the Pydantic model into a dict.
-    data_dict = data.dict()
+    data_dict = data.model_dump()
     # DO NOT MODIFY: clean up the dict to turn it into a Pandas DataFrame.
     # The data has names with hyphens and Python does not allow those as variable names.
     # Here it uses the functionality of FastAPI/Pydantic/etc to deal with this.
@@ -64,7 +64,6 @@ async def post_inference(data: Data):
     data_processed, _, _, _ = process_data(
         data,
         categorical_features=cat_features,
-        label="salary",
         training=False,
         encoder=encoder
     )
