@@ -38,7 +38,7 @@ For additional information see the Model Card paper: https://arxiv.org/pdf/1810.
 
 ## Metrics
 
-- Reported metrics: Precision, Recall, F1 (beta=1)
+- Reported metrics: Precision 0.7145, Recall 0.2570, F1 0.3780
 - Computation: compute_model_metrics in ml/model.py using predictions from inference(model, X_test)
 - Reproduce: Run `python train_model.py`. Overall metrics print to stdout; per-slice metrics append to slice_output.txt
 - Notes: zero_division=1 used to avoid undefined metrics on edge slices
